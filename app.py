@@ -9,7 +9,7 @@ st.title("🔗 QR Code Generator")
 
 url = st.text_input("Enter your URL:", placeholder="https://example.com")
 
-if st.button("Generate QR Code") and url:
+if st.button("Generate QR Code", key="generate_qr"):
     qr = qrcode.QRCode(
         version=1,
         box_size=10,
@@ -17,20 +17,23 @@ if st.button("Generate QR Code") and url:
     )
     qr.add_data(url)
     qr.make(fit=True)
-    img = qr.make_image(fill_color="black", back_color="white")
+    img = qr.make_image(fill_color="black", back_color="white").convert("RGB")
 
-    st.image(img, caption="Your QR Code", use_column_width=True)
+    # Display image
+    st.image(img, caption="Your QR Code", use_container_width=True)
 
     # Convert to bytes
     buf = io.BytesIO()
-    img.save(buf)
+    img.save(buf, format="PNG")
     byte_im = buf.getvalue()
 
+    # Download button
     st.download_button(
         label="📥 Download QR Code",
         data=byte_im,
         file_name="qr_code.png",
-        mime="image/png"
+        mime="image/png",
+        key="download_qr"
     )
-elif st.button("Generate QR Code") and not url:
-    st.warning("Please enter a valid URL!")
+else:
+    st.warning("⚠️ Please enter a valid URL!")
